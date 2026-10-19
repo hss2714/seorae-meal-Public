@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>미디어사업팀 일정</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@800&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one week per screen — people as rows, days as columns, like the team's original sheet; click a cell to type */
+:root{
+  --paper:#eef2ef; --surface:#ffffff; --sunk:#e3e9e5; --ink:#1b2826; --muted:#5b6a66; --line:#d0d9d4;
+  --accent:#1f5e58; --accent-ink:#ffffff; --pj-bg:#d9ebe7; --pj-ink:#164a45; --today:#b8860b; --hol:#b2413a;
+  --f-display:"Nanum Myeongjo","Noto Serif KR",serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --paper:#111816; --surface:#18211f; --sunk:#1f2a27; --ink:#e3ebe8; --muted:#94a39f; --line:#2c3936;
+  --accent:#6db8af; --accent-ink:#0d1714; --pj-bg:#1f3a36; --pj-ink:#bfe5df; --today:#e2b54a; --hol:#e57a72; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+header small{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;color:var(--muted)}
+header h1{margin:2px 0 0;font-family:var(--f-display);font-weight:800;font-size:clamp(22px,4vw,30px);line-height:1.15}
+.acts{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 13px;font-weight:500}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.state{font-size:12.5px;color:var(--muted)}
+.state.err{color:var(--hol)}
+.who{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+.who b{color:var(--ink);font-weight:600}
+
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.bar h2{margin:0 6px;font-family:var(--f-display);font-weight:800;font-size:21px;font-variant-numeric:tabular-nums}
+.ib{width:34px;height:34px;border:1px solid var(--line);background:var(--surface);border-radius:8px;font-size:18px;line-height:1}
+.notice{background:var(--sunk);border-radius:8px;padding:10px 14px;color:var(--muted)}
+.notice.err{color:var(--hol)}
+
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table.wk{width:100%;min-width:780px;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.wk col.c0{width:104px}
+.wk th,.wk td{border-right:1px solid var(--line);border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.wk tr>*:last-child{border-right:0}
+.wk tbody tr:last-child>*{border-bottom:0}
+.wk thead th{padding:8px 9px;font-weight:500;background:var(--sunk);font-size:12.5px}
+.wk thead .dnum{font-family:var(--f-mono);font-variant-numeric:tabular-nums;margin-left:3px}
+.wk thead th.sun,.wk thead th.hol{color:var(--hol)}
+.wk thead th.today{box-shadow:inset 0 -3px 0 var(--today)}
+.wk thead .hname{display:block;font-size:10.5px;font-weight:400;color:var(--hol)}
+.wk th.rowh{position:sticky;left:0;z-index:1;padding:8px 10px;vertical-align:middle}
+.rowh.member{background:var(--c);color:#ffffff}
+.rowh.member .nm{font-weight:600;font-size:14px;display:block}
+.rowh.member .hrs{font-family:var(--f-mono);font-size:11px;opacity:.9;display:block}
+.rowh.proj{background:var(--surface);font-weight:600}
+.wk td{height:58px;padding:5px;cursor:text;background:var(--surface)}
+.wk td:hover{background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.wk td.wkend{background:var(--sunk)}
+.wk td.regoff{background:repeating-linear-gradient(135deg,var(--sunk) 0 6px,var(--surface) 6px 12px)}
+.wk td.today{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--today) 45%,transparent)}
+.tag{display:block;border-radius:5px;padding:3px 7px;margin-bottom:4px;font-size:12.5px;line-height:1.35;overflow-wrap:anywhere;white-space:pre-wrap}
+.tag.m{background:var(--c);color:#ffffff;font-weight:500}
+.tag.p{background:var(--pj-bg);color:var(--pj-ink);font-weight:500}
+.ghost{font-size:11.5px;color:var(--muted)}
+.wk td.editing{padding:3px;box-shadow:inset 0 0 0 2px var(--accent);cursor:default}
+.wk td textarea{width:100%;min-height:50px;border:0;outline:0;resize:none;background:transparent;font-size:13px;line-height:1.4;padding:3px 4px}
+.wk td.saving{opacity:.6}
+.hint{font-size:12.5px;color:var(--muted);margin:0}
+.hint kbd{font-family:var(--f-mono);font-size:11px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--surface)}
+
+dialog{border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);padding:0;width:min(460px,calc(100vw - 32px))}
+dialog::backdrop{background:rgb(10 20 18 / .45)}
+.dlg{display:flex;flex-direction:column;gap:12px;padding:20px}
+.dlg h2{margin:0;font-family:var(--f-display);font-weight:800;font-size:19px}
+.dlg p{margin:0;color:var(--muted);font-size:13px}
+.dlg input{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:6px;padding:9px 10px;font-family:var(--f-mono);font-size:13px}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.dlg .msg{font-size:13px}
+.dlg .msg.err{color:var(--hol)}
+.dlg .msg.ok{color:var(--accent)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><small>미디어사업팀 · 주간 일정</small><h1>미디어사업팀 일정</h1></div>
+    <div class="acts">
+      <span class="state" id="state"></span>
+      <span class="who" id="who" hidden></span>
+      <button class="btn primary" id="connBtn" type="button">편집 연결</button>
+    </div>
+  </header>
+
+  <div class="bar">
+    <button class="ib" id="prev" type="button" aria-label="지난주">‹</button>
+    <h2 id="weekLabel"></h2>
+    <button class="ib" id="next" type="button" aria-label="다음 주">›</button>
+    <button class="btn" id="thisWeek" type="button">이번 주</button>
+    <button class="btn" id="reload" type="button">새로고침</button>
+  </div>
+
+  <div class="notice" id="notice">일정을 불러오는 중이에요…</div>
+
+  <div class="scroll"><table class="wk" id="grid"></table></div>
+
+  <p class="hint">칸을 누르면 바로 입력할 수 있어요. <kbd>Enter</kbd> 저장 · <kbd>Shift</kbd>+<kbd>Enter</kbd> 줄바꿈 · <kbd>Esc</kbd> 취소 · 내용을 모두 지우고 저장하면 삭제돼요. 빗금 칸은 정기 휴무, 회색 칸은 주말이에요.</p>
+</div>
+
+<dialog id="conn">
+  <form class="dlg" id="connForm" method="dialog">
+    <h2>편집 연결</h2>
+    <p>일정을 고치려면 GitHub 토큰이 필요해요. 이 컴퓨터(브라우저)에 한 번만 넣어두면 계속 쓸 수 있어요. 토큰은 이 브라우저에만 저장되고 다른 곳으로 보내지지 않아요.</p>
+    <label for="tok" class="hint">GitHub 토큰 (ghp_로 시작)</label>
+    <input id="tok" type="password" autocomplete="off" spellcheck="false" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="msg" id="connMsg"></div>
+    <div class="row">
+      <button type="button" class="btn" id="disconnect" hidden>연결 해제</button>
+      <button type="button" class="btn" id="connCancel">닫기</button>
+      <button type="submit" class="btn primary" id="connSave">연결하기</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/* ▼ 저장소 정보 — 저장소 이름이나 위치가 바뀌면 여기만 고치세요 ▼ */
+const CONFIG = { owner: "hss2714", repo: "seorae-meal-Public", branch: "main", path: "schedule/data.json" };
+
+(function(){
+  const API="https://api.github.com/repos/"+CONFIG.owner+"/"+CONFIG.repo;
+  const DOW=["일","월","화","수","목","금","토"];
+  const HOLIDAYS={"01-01":"신정","03-01":"삼일절","05-05":"어린이날","06-06":"현충일","08-15":"광복절","10-03":"개천절","10-09":"한글날","12-25":"성탄절"};
+  const $=id=>document.getElementById(id);
+  const pad=n=>String(n).padStart(2,"0");
+  const ymd=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  const parse=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+  const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d)};
+  const mondayOf=s=>{const d=parse(s);const k=(d.getDay()+6)%7;d.setDate(d.getDate()-k);return ymd(d)};
+  const today=ymd(new Date());
+
+  const S={data:{members:[],cells:{}},sha:null,week:mondayOf(today),token:"",login:"",editing:null,queue:Promise.resolve(),loaded:false};
+  try{S.token=localStorage.getItem("gh_token")||""}catch(e){}
+
+  function el(tag,attrs,...kids){const n=document.createElement(tag);
+    for(const k in attrs||{}){const v=attrs[k];if(v==null||v===false)continue;
+      if(k==="class")n.className=v;else if(k==="style")n.style.cssText=v;else if(k.startsWith("on"))n.addEventListener(k.slice(2),v);else n.setAttribute(k,v===true?"":v)}
+    for(const c of kids.flat()){if(c==null||c===false)continue;n.append(c.nodeType?c:document.createTextNode(c))}return n}
+
+  /* ---------- UTF-8 safe base64 ---------- */
+  const b64enc=s=>{const b=new TextEncoder().encode(s);let bin="";for(let i=0;i<b.length;i+=0x8000)bin+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(bin)};
+  const b64dec=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
+
+  /* ---------- GitHub ---------- */
+  function headers(json){const h={"Accept":"application/vnd.github+json"};if(S.token)h.Authorization="Bearer "+S.token;if(json)h["Content-Type"]="application/json";return h}
+  async function fetchData(){
+    const r=await fetch(API+"/contents/"+CONFIG.path+"?ref="+encodeURIComponent(CONFIG.branch)+"&t="+Date.now(),{headers:headers(),cache:"no-store"});
+    if(r.status===404)return {data:{members:[],cells:{}},sha:null};
+    if(r.status===403||r.status===429)throw Object.assign(new Error("rate"),{kind:"rate"});
+    if(r.status===401)throw Object.assign(new Error("auth"),{kind:"auth"});
+    if(!r.ok)throw new Error("http "+r.status);
+    const j=await r.json();const data=JSON.parse(b64dec(j.content));
+    data.members=data.members||[];data.cells=data.cells||{};
+    return {data,sha:j.sha};
+  }
+  async function putData(data,sha,message){
+    const body={message,content:b64enc(JSON.stringify(data,null,2)+"\n"),branch:CONFIG.branch};if(sha)body.sha=sha;
+    const r=await fetch(API+"/contents/"+CONFIG.path,{method:"PUT",headers:headers(true),body:JSON.stringify(body)});
+    if(r.status===409||r.status===422)return {conflict:true};
+    if(r.status===401)throw Object.assign(new Error("auth"),{kind:"auth"});
+    if(r.status===403||r.status===404)throw Object.assign(new Error("perm"),{kind:"perm"});
+    if(!r.ok)throw new Error("http "+r.status);
+    const j=await r.json();return {sha:j.content.sha};
+  }
+  function applyCell(data,ds,row,val){
+    data.cells=data.cells||{};
+    if(val){(data.cells[ds]=data.cells[ds]||{})[row]=val}
+    else if(data.cells[ds]){delete data.cells[ds][row];if(!Object.keys(data.cells[ds]).length)delete data.cells[ds]}
+  }
+  /* Always re-read before writing so a teammate's newer save is kept, then apply only this one cell */
+  async function saveCell(ds,row,val,label){
+    for(let i=0;i<4;i++){
+      const cur=await fetchData();applyCell(cur.data,ds,row,val);
+      const d=parse(ds);const msg="일정: "+(d.getMonth()+1)+"/"+d.getDate()+" "+label+" → "+(val?val.replace(/\n/g," / "):"(삭제)");
+      const res=await putData(cur.data,cur.sha,msg);
+      if(!res.conflict){S.data=cur.data;S.sha=res.sha;return}
+      await new Promise(r=>setTimeout(r,400+Math.random()*600));
+    }
+    throw new Error("conflict");
+  }
+
+  /* ---------- status ---------- */
+  function setState(t,err){const s=$("state");s.textContent=t||"";s.classList.toggle("err",!!err)}
+  function notice(t,err){const n=$("notice");if(!t){n.hidden=true;return}n.hidden=false;n.textContent=t;n.classList.toggle("err",!!err)}
+  function errText(e){
+    if(e&&e.kind==="rate")return S.token?"GitHub 요청 한도에 걸렸어요. 1~2분 뒤 새로고침해 주세요.":"GitHub 조회 한도(시간당 60회)에 걸렸어요. ‘편집 연결’로 토큰을 넣으면 한도가 넉넉해져요.";
+    if(e&&e.kind==="auth")return "토큰이 맞지 않거나 만료됐어요. ‘편집 연결’에서 새 토큰을 넣어 주세요.";
+    if(e&&e.kind==="perm")return "이 계정은 저장소에 쓰기 권한이 없어요. 협업자 초대를 수락했는지, 토큰에 public_repo 권한이 있는지 확인해 주세요.";
+    if(e&&e.message==="conflict")return "다른 사람이 동시에 저장하고 있어요. 잠시 뒤 다시 입력해 주세요.";
+    return "저장하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.";
+  }
+
+  /* ---------- render ---------- */
+  function rows(){return [{id:"project",name:"프로젝트",proj:true},...S.data.members]}
+  /* Never rebuild the table under an open editor (a teammate's update or a finished save would wipe what's being typed) */
+  function render(){
+    if(S.editing)return;
+    const d0=parse(S.week),d6=parse(addDays(S.week,6));
+    $("weekLabel").textContent=(d0.getMonth()+1)+"월 "+d0.getDate()+"일 – "+(d0.getMonth()!==d6.getMonth()?(d6.getMonth()+1)+"월 ":"")+d6.getDate()+"일";
+    const t=$("grid");t.replaceChildren();
+    const cg=el("colgroup",{},el("col",{class:"c0"}));for(let i=0;i<7;i++)cg.append(el("col"));t.append(cg);
+    const days=[...Array(7)].map((_,i)=>addDays(S.week,i));
+    const hr=el("tr",{},el("th",{class:"rowh",style:"background:var(--sunk)"}));
+    for(const ds of days){const d=parse(ds),dow=d.getDay(),hol=HOLIDAYS[ds.slice(5)];
+      hr.append(el("th",{class:(dow===0?"sun ":"")+(hol?"hol ":"")+(ds===today?"today":"")},DOW[dow],el("span",{class:"dnum"},(d.getMonth()+1)+"/"+d.getDate()),hol?el("span",{class:"hname"},hol):null))}
+    t.append(el("thead",{},hr));
+    const tb=el("tbody");
+    for(const r of rows()){
+      const head=r.proj?el("th",{class:"rowh proj",scope:"row"},"프로젝트")
+        :el("th",{class:"rowh member",scope:"row",style:"--c:"+(r.color||"#5b6a66")},el("span",{class:"nm"},r.name||"이름 없음"),
+          (r.start&&r.end)?el("span",{class:"hrs"},r.start+"–"+r.end):null);
+      const tr=el("tr",{},head);
+      for(const ds of days){
+        const dow=parse(ds).getDay();const val=((S.data.cells[ds]||{})[r.id])||"";
+        const hasWD=!r.proj&&Array.isArray(r.workDays);const works=hasWD&&r.workDays.includes(dow);
+        const weekend=dow===0||dow===6;
+        let cls=ds===today?"today ":"";
+        if(hasWD&&!works&&!weekend)cls+="regoff";else if(weekend&&!(hasWD&&works))cls+="wkend";
+        const td=el("td",{class:cls,"data-ds":ds,"data-row":r.id,tabindex:"0","aria-label":(r.name||"프로젝트")+" "+ds+(val?" "+val:" 비어 있음")});
+        if(val){for(const line of val.split("\n").filter(Boolean))td.append(el("span",{class:"tag "+(r.proj?"p":"m"),style:r.proj?null:"--c:"+(r.color||"#5b6a66")},line))}
+        else if(hasWD&&!works&&!weekend)td.append(el("span",{class:"ghost"},"정기 휴무"));
+        else if(hasWD&&works&&weekend)td.append(el("span",{class:"ghost"},"출근"));
+        tr.append(td)}
+      tb.append(tr)}
+    t.append(tb);
+  }
+
+  /* ---------- inline edit ---------- */
+  /* Pressing another cell while editing: keep focus, save the current cell, then open the pressed one */
+  const cellOf=(ds,row)=>$("grid").querySelector('td[data-ds="'+ds+'"][data-row="'+row+'"]');
+  $("grid").addEventListener("mousedown",e=>{const td=e.target.closest("td[data-ds]");
+    if(!S.editing||!td||td.classList.contains("editing"))return;
+    e.preventDefault();const ds=td.dataset.ds,row=td.dataset.row;
+    S.editing.finish(true);const n=cellOf(ds,row);if(n)startEdit(n)});
+  $("grid").addEventListener("click",e=>{const td=e.target.closest("td[data-ds]");if(td&&!td.classList.contains("editing")&&!S.editing)startEdit(td)});
+  $("grid").addEventListener("keydown",e=>{const td=e.target.closest&&e.target.closest("td[data-ds]");if(td&&e.target===td&&(e.key==="Enter"||e.key===" ")){e.preventDefault();startEdit(td)}});
+  function startEdit(td){
+    if(!S.loaded)return;
+    if(!S.token){openConn("일정을 고치려면 먼저 GitHub 토큰을 연결해 주세요.");return}
+    const ds=td.dataset.ds,row=td.dataset.row;
+    if(S.editing){S.editing.finish(true);td=cellOf(ds,row);if(!td)return}const old=((S.data.cells[ds]||{})[row])||"";
+    td.classList.add("editing");td.replaceChildren();
+    const ta=el("textarea",{"aria-label":"일정 입력"});ta.value=old;td.append(ta);
+    const fit=()=>{ta.style.height="auto";ta.style.height=Math.max(50,ta.scrollHeight)+"px"};fit();ta.addEventListener("input",fit);
+    let done=false;
+    const finish=(save)=>{if(done)return;done=true;S.editing=null;
+      const val=ta.value.split("\n").map(s=>s.trim()).filter(Boolean).join("\n").slice(0,300);
+      if(!save||val===old)render();else commit(ds,row,val,old)};
+    S.editing={finish};
+    ta.addEventListener("keydown",e=>{
+      if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();finish(true)}
+      else if(e.key==="Escape"){e.preventDefault();finish(false)}});
+    ta.addEventListener("blur",()=>finish(true));
+    ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);
+  }
+  function commit(ds,row,val,old){
+    applyCell(S.data,ds,row,val);render();
+    const td=$("grid").querySelector('td[data-ds="'+ds+'"][data-row="'+row+'"]');if(td)td.classList.add("saving");
+    const r=rows().find(x=>x.id===row);const label=r?(r.proj?"프로젝트":r.name):row;
+    setState("저장 중…");
+    S.queue=S.queue.then(()=>saveCell(ds,row,val,label)).then(()=>{
+      const n=new Date();setState("저장됨 "+pad(n.getHours())+":"+pad(n.getMinutes()));render()
+    }).catch(e=>{applyCell(S.data,ds,row,old);render();setState(errText(e),true);if(e&&e.kind==="auth")openConn(errText(e))});
+  }
+
+  /* ---------- load & refresh ---------- */
+  async function load(quiet){
+    if(S.editing)return;
+    try{const r=await fetchData();
+      if(r.sha!==S.sha||!S.loaded){S.data=r.data;S.sha=r.sha;S.loaded=true;render()}
+      if(!S.data.members.length)notice("아직 일정 파일(schedule/data.json)이 없어요. 안내에 따라 data.json을 저장소에 올려 주세요.");else notice("");
+    }catch(e){if(!quiet||!S.loaded)notice(e.kind==="rate"||e.kind==="auth"?errText(e):"일정을 불러오지 못했어요. 인터넷 연결을 확인하고 새로고침해 주세요.",true)}
+  }
+  $("prev").onclick=()=>{S.week=addDays(S.week,-7);render()};
+  $("next").onclick=()=>{S.week=addDays(S.week,7);render()};
+  $("thisWeek").onclick=()=>{S.week=mondayOf(today);render()};
+  $("reload").onclick=()=>load(false);
+  /* With a token GitHub allows plenty of reads, so refresh every 30s; without one, only on demand (60 reads/hour per network) */
+  setInterval(()=>{if(S.token&&!document.hidden)load(true)},30000);
+  document.addEventListener("visibilitychange",()=>{if(S.token&&!document.hidden)load(true)});
+
+  /* ---------- token ---------- */
+  function showWho(){const w=$("who");if(S.token&&S.login){w.hidden=false;w.replaceChildren("편집 중:",el("b",{},S.login));$("connBtn").textContent="연결 설정";$("connBtn").classList.remove("primary")}
+    else{w.hidden=true;$("connBtn").textContent="편집 연결";$("connBtn").classList.add("primary")}}
+  function openConn(msg){$("tok").value="";$("connMsg").textContent=msg||"";$("connMsg").className="msg"+(msg?" err":"");$("disconnect").hidden=!S.token;$("conn").showModal();$("tok").focus()}
+  $("connBtn").onclick=()=>openConn("");
+  $("connCancel").onclick=()=>$("conn").close();
+  $("disconnect").onclick=()=>{S.token="";S.login="";try{localStorage.removeItem("gh_token")}catch(e){}showWho();$("conn").close();setState("연결을 해제했어요.")};
+  $("connForm").addEventListener("submit",async e=>{e.preventDefault();
+    const tok=$("tok").value.trim();const m=$("connMsg");
+    if(!tok){m.className="msg err";m.textContent="토큰을 붙여넣어 주세요.";return}
+    m.className="msg";m.textContent="확인하는 중…";$("connSave").disabled=true;
+    try{
+      const r=await fetch(API,{headers:{"Accept":"application/vnd.github+json","Authorization":"Bearer "+tok},cache:"no-store"});
+      if(r.status===401){m.className="msg err";m.textContent="토큰이 올바르지 않아요. 복사할 때 앞뒤가 잘리지 않았는지 확인해 주세요.";return}
+      if(!r.ok){m.className="msg err";m.textContent="저장소를 찾지 못했어요. 협업자 초대를 수락했는지 확인해 주세요.";return}
+      const j=await r.json();
+      if(!j.permissions||!j.permissions.push){m.className="msg err";m.textContent="이 계정은 저장소에 쓰기 권한이 없어요. 저장소 주인에게 협업자(Collaborator) 초대를 받아 수락해 주세요.";return}
+      const u=await fetch("https://api.github.com/user",{headers:{"Authorization":"Bearer "+tok}}).then(x=>x.ok?x.json():{}).catch(()=>({}));
+      S.token=tok;S.login=u.login||"";try{localStorage.setItem("gh_token",tok);localStorage.setItem("gh_login",S.login)}catch(e){}
+      m.className="msg ok";m.textContent="연결됐어요. 이제 칸을 눌러 입력할 수 있어요.";showWho();setTimeout(()=>$("conn").close(),700);load(true);
+    }catch(err){m.className="msg err";m.textContent="GitHub에 연결하지 못했어요. 인터넷 연결을 확인해 주세요."}
+    finally{$("connSave").disabled=false}});
+  try{S.login=localStorage.getItem("gh_login")||""}catch(e){}
+
+  showWho();render();load(false);
+})();
+</script>
+</body>
+</html>
